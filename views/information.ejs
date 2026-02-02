@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="styles/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="informationScreen">
+        <h1 id="informationHeader">Blog</h1>
+        <form id="informationForm" >
+            <div id="infomationTitleInputPanel">
+                <label for="infomationTitleInput">Title</label>
+                <input required type="text" name="title" id="informationTitleInput">
+            </div>
+            <div id="informatioNotesPanel">
+                <label for="informationNotesInput">Notes</label>
+                <textarea name="notes" id="informationNotesInput"></textarea>
+            </div>
+            <div id="informationReviewPanel">
+                <label for="informationReviewInput">Review</label>
+                <textarea name="review" id="informationReviewInput"></textarea>
+            </div>
+            <div id="informationRatingsPanel">
+                <label for="informationRatingsInput">Rating</label>
+                <select name="rating" id="informationRatingsInput">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <div id="informationDatePanel">
+                <label for="informationDateInput">Date you started reading the book</label>
+                <input required type="date" name="start" id="informationDateInput">
+            </div>
+            <button id="submitButton" class="btn btn-success informationButton" onclick="validateInput()">Submit</button>
+            <button type="button" class="btn btn-primary informationButton">cancel</button>
+        </form>
+    </div>
+    <script src="client.js"></script>
+</body>
+</html>
