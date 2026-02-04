@@ -31,7 +31,7 @@ await db.query("create table if not exists thoughts(id serial primary key,book_i
 app.get("/",async(req,res)=>{
     var results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id");
     var data=results.rows;
-    console.log(data);
+    //console.log(data);
     res.render("index.ejs",{books:data});
 });
 
@@ -44,6 +44,31 @@ app.get("/information/:id",async (req,res)=>{
     var results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where books.id=${req.params.id}`);
     var data=results.rows[0];
     res.json({data});
+});
+
+app.get("/search",async(req,res)=>{
+    console.log("sssss");
+    console.log(req.query);
+    var results=[];
+    if(req.query.title && req.query.title.trim()!=""){
+         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where title like '%${req.query.title}%' order by ${req.query.sort} ASC"`);
+        /*if(req.query.title.trim()==""){
+            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id");
+        }
+        else{
+           
+        }*/
+    }
+    else{
+        results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id order by ${req.query.sort} ASC`);
+        /*if(req.query.sort=="title"){
+            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id order by title ASC");
+        }else{
+            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id order by started ASC");
+        }*/
+    }
+    var data=results.rows;
+    res.render("index.ejs",{books:data});
 });
 
 app.patch("/:id",async(req,res)=>{

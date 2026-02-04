@@ -30,6 +30,14 @@ function hideMe(){
     setupDefaultDate();
 }
 
+function performSearch(){
+    var searchTitle=document.querySelector("#searchInput").value;
+    if(searchTitle.trim()==""){
+        return;
+    }
+    
+}
+
 function deleteReview(){
     fetch(`/${bookId}`,{
                 method:'DELETE',

@@ -10,6 +10,11 @@ td{
 h1{
     text-align: center;
     margin-bottom: 3rem;
+    color: green;
+}
+
+hr{
+    color: green;
 }
 
 .search-panel{
@@ -33,6 +38,9 @@ h1{
 .book-list-container{
     border: 1pt solid lightgray;
     margin-top: 10px;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-around;
 }
 .title-review-container{
     display: inline-block;
@@ -47,6 +55,8 @@ h1{
     min-width: 40vw;
     max-width: 40vw;
     padding-left: 5pt;
+    margin:1rem;
+    background-color: beige;
 }
 
 #informationScreen{
@@ -152,4 +162,21 @@ div > input[type=Date]{
 
 #updateButton{
     display: none;
+}
+
+#sortBy{
+    min-width: 6rem;
+    margin-left: 1rem;
+}
+
+#sortByLabel{
+    margin-left:1rem;
+}
+
+#searchInput{
+    margin-left:1rem;
+}
+
+#createButton{
+    margin-right: 1rem;
 }
