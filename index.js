@@ -1,15 +1,18 @@
 import express from 'express';
 import pg from 'pg';
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app=express();
 const port=3000;
 const db=new pg.Client({
-    user:"postgres",
-    password:"pass",
-    database:"Book_reading",
-    host:"localhost",
-    port:5432
+    user:process.env.USER,
+    password:process.env.PASSWORD,
+    database:process.env.DATABASE,
+    host:process.env.HOST,
+    port:process.env.PORT,
 });
 
 app.use(express.json({ limit: '1mb', type: 'application/json' }));
@@ -41,31 +44,43 @@ app.get("/create",(req,res)=>{
 
 app.get("/information/:id",async (req,res)=>{
     console.log("getting "+req.params.id);
-    var results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where books.id=${req.params.id}`);
+    var results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where books.id=$1`,[req.params.id]);
     var data=results.rows[0];
     res.json({data});
 });
 
 app.get("/search",async(req,res)=>{
-    console.log("sssss");
-    console.log(req.query);
     var results=[];
-    if(req.query.title && req.query.title.trim()!=""){
-         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where title like '%${req.query.title}%' order by ${req.query.sort} ASC"`);
-        /*if(req.query.title.trim()==""){
-            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id");
+    var column=req.query.searchBy;
+    var parameter=req.query.searchText;
+    var operator;
+    if(column=="title"){
+        operator="like";
+        parameter=`'%${req.query.searchText}%'`;
+    }
+    else{
+        operator="=";
+        if(column=="started"){
+            console.log("started");
+            parameter=`'${parameter}'`;
+        }else if(column=="review"){
+            if(parameter=="on"){
+                operator='is not NULL';
+                parameter="and review !=''";
+            }
+            else{
+                operator='is NULL';
+                parameter=`or review = ''`
+            }
         }
-        else{
-           
-        }*/
+    }
+    if(parameter && parameter.trim()!=""){
+        console.log(parameter);
+        console.log(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${req.query.sort} ASC`,[parameter])
+         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${req.query.sort} ASC`,[parameter]);
     }
     else{
         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id order by ${req.query.sort} ASC`);
-        /*if(req.query.sort=="title"){
-            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id order by title ASC");
-        }else{
-            results=await db.query("select * from books inner join thoughts on books.id=thoughts.book_id order by started ASC");
-        }*/
     }
     var data=results.rows;
     res.render("index.ejs",{books:data});
@@ -74,9 +89,8 @@ app.get("/search",async(req,res)=>{
 app.patch("/:id",async(req,res)=>{
     try{
         var coverImage=await getImageId(req.body.title);
-        await db.query(`update books set title='${req.body.title}', started='${req.body.start}', cover=${coverImage} where id=${req.params.id}`);
-        console.log(`update thoughts set notes='${req.body.notes}', review='${req.body.review}',rating=${req.body.rating} where book_id=${req.params.id}`);
-        await db.query(`update thoughts set notes='${req.body.notes}', review='${req.body.review}',rating=${req.body.rating} where book_id=${req.params.id}`);
+        await db.query(`update books set title=$1, started=$2, cover=${coverImage} where id=$3`,[req.body.title,req.body.start,req.params.id]);
+        await db.query(`update thoughts set notes=$1, review=$2,rating=$3 where book_id=$4`,[req.body.notes,req.body.review,req.body.rating,req.params.id]);
         res.sendStatus(200);
     }catch(err){
         console.log(err);
@@ -86,8 +100,8 @@ app.patch("/:id",async(req,res)=>{
 
 app.delete("/:id",async(req,res)=>{
     try{
-        await db.query(`delete from books where id=${req.params.id}`);
-        await db.query(`delete from thoughts where book_id=${req.params.id}`);
+        await db.query(`delete from books where id=$1`,[req.params.id]);
+        await db.query(`delete from thoughts where book_id=$1`,[req.params.id]);
         res.sendStatus(200);
     }catch(err){
         res.sendStatus(400);
@@ -99,15 +113,15 @@ app.post("/",async (req,res)=>{
             res.status(404).json({error: "The book title and start date must not be empty"});
     }
     else{
-        var bookAlreadyExits=await db.query(`select * from books where title='${req.body.title}'`);
+        var bookAlreadyExits=await db.query(`select * from books where title=$1`,[req.body.title]);
         if(bookAlreadyExits.rowCount>0){
             res.status(404).send({error: "A book with that title already exists"});
         }
         else{
             var coverImage= await getImageId(req.body.title);
-            var results=await db.query(`insert into books(title,started,cover) values('${req.body.title}','${req.body.start}',${coverImage}) returning books.id`);
+            var results=await db.query(`insert into books(title,started,cover) values($1,$2,${coverImage}) returning books.id`,[req.body.title,req.body.start]);
             var id=(results.rows)[0].id;
-            await db.query(`insert into thoughts(book_id,notes,review,rating) values(${id},'${req.body.notes}','${req.body.review}',${req.body.rating})`);
+            await db.query(`insert into thoughts(book_id,notes,review,rating) values(${id},$1,$2,$3)`,[req.body.notes,req.body.review,req.body.rating]);
             res.status(200).json({message: "Book created successfully"});
         }
     }

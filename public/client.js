@@ -38,6 +38,33 @@ function performSearch(){
     
 }
 
+function searchBoxChange(){
+    var searchBox=document.querySelector("#searchInput");
+    var searchBy=document.querySelector("#searchByInput");
+    var searchLabel=document.querySelector("#searchInputLabel");
+    searchBox.value="";
+    searchBox.innerHTML="";
+    searchLabel.style.display="none";
+    switch(searchBy.value){
+        case "title":
+            searchBox.type="text";
+            break;
+        case "started":
+            searchBox.type="date";
+            break;
+        case "review":
+            searchBox.type="checkbox";
+            searchLabel.innerHTML="Yes";
+            searchLabel.style.display="contents";
+            break;
+        case "rating":
+            searchBox.type="number";
+            searchLabel.innerHTML="Rating value(0-5):";
+            searchLabel.style.display="contents";
+            break;
+    }
+}
+
 function deleteReview(){
     fetch(`/${bookId}`,{
                 method:'DELETE',

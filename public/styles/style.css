@@ -180,3 +180,26 @@ div > input[type=Date]{
 #createButton{
     margin-right: 1rem;
 }
+
+#searchInputLabel{
+    display: none;
+}
+
+#searchByLabel{
+    margin-left: 5pt;
+    margin-right: 5pt;
+}
+
+#searchByInput{
+    margin-right: 10pt;
+}
+
+#searchButton{
+    width: 25pt;
+    height: 25pt;
+}
+
+#sortButton{
+    width: 25pt;
+    height: 25pt;
+}
