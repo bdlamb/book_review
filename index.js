@@ -54,9 +54,15 @@ app.get("/search",async(req,res)=>{
     var column=req.query.searchBy;
     var parameter=req.query.searchText;
     var operator;
+    var sortParams=req.query.sort.split(" ");
+    if(sortParams.length==1){
+        sortParams.push("ASC");
+    }
+    console.log(sortParams);
+    console.log(req.query.sort);
     if(column=="title"){
         operator="like";
-        parameter=`'%${req.query.searchText}%'`;
+        parameter= req.query.searchText ? `'%${req.query.searchText}%'` : "";
     }
     else{
         operator="=";
@@ -76,11 +82,11 @@ app.get("/search",async(req,res)=>{
     }
     if(parameter && parameter.trim()!=""){
         console.log(parameter);
-        console.log(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${req.query.sort} ASC`,[parameter])
-         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${req.query.sort} ASC`,[parameter]);
+        console.log(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter])
+         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter]);
     }
     else{
-        results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id order by ${req.query.sort} ASC`);
+        results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id order by ${sortParams[0]} ${sortParams[1]}`);
     }
     var data=results.rows;
     res.render("index.ejs",{books:data});

@@ -203,3 +203,21 @@ div > input[type=Date]{
     width: 25pt;
     height: 25pt;
 }
+
+#checkboxSort{
+    display: none;
+
+}
+
+.btn-checkbox{
+    width: 25pt;
+    height: 25pt;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../icons/arrow-up.svg");
+}
+
+.checked{
+    background-image: url("../icons/arrow-down.svg");;
+}

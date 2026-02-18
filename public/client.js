@@ -181,3 +181,8 @@ function validateInput(id=-1){
         });
 
 }
+
+function toggleCheckbox(){
+    console.log("tooggleing");
+    document.querySelector(".btn-checkbox").classList.toggle("checked");
+}
