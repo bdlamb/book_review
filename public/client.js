@@ -42,25 +42,57 @@ function searchBoxChange(){
     var searchBox=document.querySelector("#searchInput");
     var searchBy=document.querySelector("#searchByInput");
     var searchLabel=document.querySelector("#searchInputLabel");
+    var searchOpertor=document.querySelector("#searchOpertorInput");
     searchBox.value="";
     searchBox.innerHTML="";
     searchLabel.style.display="none";
+    searchOpertor.innerHTML="";
+    searchOpertor.style.visibility="visible";
     switch(searchBy.value){
         case "title":
             searchBox.type="text";
+            var option=document.createElement("option");
+            option.value="=";
+            option.innerHTML="Contains";
+            searchOpertor.appendChild(option);
             break;
         case "started":
             searchBox.type="date";
+            var option=document.createElement("option");
+            option.value="=";
+            option.innerHTML="Equals";
+            searchOpertor.appendChild(option);
+            var option2=document.createElement("option");
+            option2.value=">=";
+            option2.innerHTML="Greater than";
+            searchOpertor.appendChild(option2);
+            var option3=document.createElement("option");
+            option3.value="<=";
+            option3.innerHTML="Less than";
+            searchOpertor.appendChild(option3);
             break;
         case "review":
             searchBox.type="checkbox";
             searchLabel.innerHTML="Yes";
             searchLabel.style.display="contents";
+            searchOpertor.style.visibility="hidden";
             break;
         case "rating":
             searchBox.type="number";
             searchLabel.innerHTML="Rating value(0-5):";
             searchLabel.style.display="contents";
+            var option=document.createElement("option");
+            option.value="=";
+            option.innerHTML="Equals";
+            searchOpertor.appendChild(option);
+            var option2=document.createElement("option");
+            option2.value=">=";
+            option2.innerHTML="Greater than";
+            searchOpertor.appendChild(option2);
+            var option3=document.createElement("option");
+            option3.value="<=";
+            option3.innerHTML="Less than";
+            searchOpertor.appendChild(option3);
             break;
     }
 }

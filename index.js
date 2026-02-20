@@ -24,6 +24,7 @@ db.connect();
 
 const searchBaseUrl="https://openlibrary.org/search.json?title=";
 const imageBaseUrl="https://covers.openlibrary.org/b/id/";
+const searchString="select * from books inner join thoughts on books.id=thoughts.book_id where";
 
 await db.query("create table if not exists book(id serial primary key,title varchar(100) not null,started Date not null, cover bigint)");
 await db.query("create table if not exists thoughts(id serial primary key,book_id integer references book(id),notes text, review text, rating int)");
@@ -52,50 +53,83 @@ app.get("/information/:id",async (req,res)=>{
 app.get("/search",async(req,res)=>{
     var results=[];
     var column=req.query.searchBy;
-    var parameter=req.query.searchText;
-    var operator;
-    var sortParams=req.query.sort.split(" ");
-    if(sortParams.length==1){
-        sortParams.push("ASC");
-    }
-    console.log(sortParams);
-    console.log(req.query.sort);
+    var parameter=req.query.searchText.trim();
+    var operator= req.query.operator ? getOperator(req.query.operator) : "=";
+    var sortParams=getSortParams(req.query.sort);
     if(column=="title"){
         operator="ILIKE";
-        parameter= req.query.searchText ? `'%${req.query.searchText}%'` : "";
+        parameter= req.query.searchText ? `%${parameter}%` : "";
+        results=await db.query(`${searchString} ${column} ILIKE $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter]);
     }
     else{
-        operator="=";
         if(column=="started"){
-            console.log("started");
-            parameter=`'${parameter}'`;
+            parameter=`${parameter}`;
+            results=await db.query(`${searchString} ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter]);
         }else if(column=="review"){
             if(parameter=="on"){
                 operator='is not NULL';
-                parameter="and review !=''";
+                parameter=`and review != ''`;
+                //console.log("rrr");
+                results=await db.query(`${searchString} ${column} is not NULL and review != '' order by ${sortParams[0]} ${sortParams[1]}`);
             }
             else{
                 operator='is NULL';
-                parameter=`or review = ''`
+                parameter=`or review = ''` ;
+                results=await db.query(`${searchString} ${column} is NULL or review = '' order by ${sortParams[0]} ${sortParams[1]}`);
             }
+
+        }else if(column=="rating"){
+             results=await db.query(`${searchString} ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter]);
         }
-    }
-    if(parameter && parameter.trim()!=""){
-        console.log(parameter);
-        console.log(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter])
-         results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id where ${column} ${operator} $1 order by ${sortParams[0]} ${sortParams[1]}`,[parameter]);
-    }
-    else{
-        results=await db.query(`select * from books inner join thoughts on books.id=thoughts.book_id order by ${sortParams[0]} ${sortParams[1]}`);
+        else{
+            results=await db.query(`${searchString}y ${sortParams[0]} ${sortParams[1]}`);
+        }
     }
     var data=results.rows;
     res.render("index.ejs",{books:data});
 });
 
+function getOperator(operator){
+    switch(operator){
+        case "=":
+            return "=";
+        case ">=":
+            return ">=";
+        case "<=":
+            return "<=";
+        default:
+            return "=";
+    }
+}
+
+function getSortParams(sortString){
+    if(sortString){
+        var sortStringSplited=sortString.split(" ");
+        if(sortStringSplited.length<2){
+            sortStringSplited.push("ASC");
+        }
+        var acceptedColumns = ["title","started","rating","reviewed"];
+        var acceptedDirections=["ASC","DECS"];
+        if(acceptedColumns.includes(sortStringSplited[0])){
+            if(acceptedDirections.includes(sortStringSplited[1])){
+                return sortStringSplited;
+            }
+            else{
+                return [sortStringSplited[0],"ASC"];
+            }
+        }
+        else{
+            return ["title","ASC"];
+        }
+    }else{
+        return ["title","ASC"];
+    }
+}
+
 app.patch("/:id",async(req,res)=>{
     try{
         var coverImage=await getImageId(req.body.title);
-        var anotherBook=await db.query(`select * from books where lower(title)=$1 and id != $2`.[req.body.title.toLowerCase(),req.params.id]);
+        var anotherBook=await db.query(`select * from books where lower(title)=$1 and id != $2`,[req.body.title.toLowerCase(),req.params.id]);
         if(results.rowCount>0){
             res.status(400).send({error: "Book with than name already exists you can only have on entry for a given title."})
         }
