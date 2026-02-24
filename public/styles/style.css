@@ -1,3 +1,6 @@
+body{
+    background-image: url("../images/sky.jpg");
+}
 th{
     text-align: center;
     align-content: center;
@@ -10,11 +13,19 @@ td{
 h1{
     text-align: center;
     margin-bottom: 3rem;
+    color: #18c318;
+}
+
+h3{
+    color: blue;
+}
+
+p{
     color: green;
 }
 
 hr{
-    color: green;
+    color: #18c318;
 }
 
 .search-panel{
@@ -23,10 +34,6 @@ hr{
 
 .top-panel{
     display: inline;
-}
-
-.addButton{
-    float:right;
 }
 
 .deleteButton{
@@ -41,6 +48,7 @@ hr{
     display: inline-flex;
     width: 100%;
     justify-content: space-around;
+    background-image: url("../images/grass.jpg");
 }
 .title-review-container{
     display: inline-block;
@@ -52,7 +60,7 @@ hr{
     align-items: flex-start;
     border: 3pt solid green;
     border-radius: 5%;
-    min-width: 40vw;
+    min-width: 320px;
     max-width: 40vw;
     padding-left: 5pt;
     margin:1rem;
@@ -75,7 +83,7 @@ div > label{
 }
 
 div > input[type=text]{
-    min-width: 30rem;
+    min-width: 15rem;
     margin-bottom: 2rem;
 }
 
@@ -86,7 +94,7 @@ div > textarea{
 }
 
 div > select{
-    min-width: 10rem;
+    min-width: 5rem;
     margin-bottom: 2rem;
 }
 
@@ -123,6 +131,12 @@ div > input[type=Date]{
     max-height: 100%;
     width: 100%;
     height: 100%;
+}
+
+#createPanel{
+    width: 100%;
+    justify-content:end;
+    display:inline-flex
 }
 
 #overlayFrame{
@@ -171,6 +185,8 @@ div > input[type=Date]{
 
 #sortByLabel{
     margin-left:1rem;
+    color: #18c318;
+    display: inline;
 }
 
 #searchInput{
@@ -183,11 +199,15 @@ div > input[type=Date]{
 
 #searchInputLabel{
     display: none;
+    color: #18c318;
+    display: inline;
 }
 
 #searchByLabel{
     margin-left: 5pt;
     margin-right: 5pt;
+    color: #18c318;
+    display: inline;
 }
 
 #searchByInput{
@@ -220,4 +240,10 @@ div > input[type=Date]{
 
 .checked{
     background-image: url("../icons/arrow-down.svg");;
+}
+
+@media screen and (max-width:500pt){
+    .book-list-container{
+        display: block;
+    }
 }
